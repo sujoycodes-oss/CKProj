@@ -6,11 +6,9 @@
 ## 🚀 Features
 
 - User authentication and role management (Admin, Read-Only, Customer)
-- Dual listbox UI for assigning AWS accounts to users
 - JWT-based authentication with session storage
 - Redux-powered state management with persistence
 - RESTful API with Spring Boot
-- Role-based dashboard UI
 - Cloud account onboarding flow
 
 ---
@@ -30,9 +28,9 @@
 - Spring Boot 3+
 - Spring Security + JWT
 - Spring Data JPA
-- H2/PostgreSQL/MySQL (based on config)
+- MySQL 
 - Lombok
-- Maven or Gradle
+- Gradle
 
 ---
 
