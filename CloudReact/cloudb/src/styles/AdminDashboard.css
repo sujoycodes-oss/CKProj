@@ -1,0 +1,37 @@
+.users-dashboard{
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+h1{
+    margin-left: 15px;
+}
+
+.floating-top{
+    display: inline-block;
+}
+
+.whole-btn{
+    background-color: #093ca2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    margin-left: 15px;
+    padding: 1rem 0.2rem;
+    margin-top: 0;
+}
+
+.whole-btn:hover {
+    background-color: #072d80;
+}
+
+.fa-plus{
+    width: 20px;
+    height: auto;
+    padding: 1px;
+    margin-right: 10px;
+}

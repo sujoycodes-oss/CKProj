@@ -1,0 +1,85 @@
+
+.onboarding-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8fafc;
+}
+
+.manual-card-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 3rem;
+}
+
+.manual-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #1e293b;
+}
+
+.manual-card {
+    width: 300px;
+    text-align: center;
+    background: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.icon-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: #eef2ff;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-icon {
+    color: #6366f1;
+    font-size: 2.25rem;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #1e293b;
+}
+
+.card-description {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+}
+
+.next-circle-button {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #eef2ff;
+    color: #6366f1;
+    border: none;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.next-circle-button:hover {
+    background-color: #e0e7ff;
+}
+
+.arrow-icon {
+    font-size: 1.25rem;
+}

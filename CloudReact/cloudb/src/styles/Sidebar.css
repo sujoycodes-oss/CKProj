@@ -1,0 +1,43 @@
+.menu {
+    width: 12%;
+    background-color: white;
+    height: 100%;
+    padding-top: 20px;
+    border-right: 1px solid #e2e2e2;
+    font-family: 'Roboto', sans-serif;
+}
+
+.menu-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 0 12px;
+}
+
+.item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    color: black;
+    text-decoration: none;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+
+.item:hover {
+    background-color: #e0e7ff;
+}
+
+.icon {
+    font-size: 18px;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.item:hover .icon {
+    background-color: #4798d3;
+    color: white;
+}

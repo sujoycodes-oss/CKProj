@@ -1,0 +1,32 @@
+# === Global OS files ===
+.DS_Store
+Thumbs.db
+
+# === Logs ===
+*.log
+npm-debug.log*
+
+# === Environment files ===
+*.env
+
+# === Java / Spring Boot ===
+CloudBalance/backend/target/
+CloudBalance/backend/.classpath
+CloudBalance/backend/.project
+CloudBalance/backend/.settings/
+CloudBalance/backend/.idea/
+
+# === Gradle Wrapper ===
+CloudBalance/backend/.gradle/
+CloudBalance/backend/build/
+
+# === React (Vite) ===
+CloudReact/cloudb/node_modules/
+CloudReact/cloudb/dist/
+CloudReact/cloudb/.vite/
+CloudReact/cloudb/.next/
+
+# === IDEs ===
+*.iml
+.vscode/
+.idea/

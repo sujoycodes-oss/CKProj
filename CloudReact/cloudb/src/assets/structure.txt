@@ -1,0 +1,51 @@
+frontend/
+├── public/
+│   ├── index.html
+│   ├── favicon.ico
+│   └── assets/              # Static files
+│       ├── images/
+│       └── fonts/
+│
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── auth/
+│   │   │   ├── LoginForm.jsx
+│   │   │   └── ProtectedRoute.jsx
+│   │   ├── ui/
+│   │   │   ├── Alert.jsx
+│   │   │   └── Loader.jsx
+│   │
+│   ├── contexts/            # React contexts
+│   │   └── AuthContext.jsx
+│   │
+│   ├── hooks/               # Custom hooks
+│   │   └── useAuth.js
+│   │
+│   ├── pages/               # Page components
+│   │   ├── auth/
+│   │   │   ├── LoginPage.jsx
+│   │   │   └── RegisterPage.jsx
+│   │   ├── admin/
+│   │   │   ├── Dashboard.jsx
+│   │   │   └── Users.jsx
+│   │   └── user/
+│   │       └── Profile.jsx
+│   │
+│   ├── services/            # API services
+│   │   ├── authService.js
+│   │   ├── api.js          # Axios instance
+│   │   └── userService.js
+│   │
+│   ├── utils/               # Utility functions
+│   │   ├── auth.js
+│   │   └── helpers.js
+│   │
+│   ├── styles/              # Global styles
+│   │   ├── main.css
+│   │   └── variables.css
+│   │
+│   ├── App.js               # Main app router
+│   └── index.js             # Entry point
+│
+├── package.json
+└── .env                     # Environment variables

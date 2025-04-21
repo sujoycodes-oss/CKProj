@@ -1,0 +1,162 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4.5rem;
+    background: white;
+    border-bottom: 1px solid #e6e6e6;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+}
+
+.navbar-container {
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 2.2rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.welcome-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #333;
+}
+
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+}
+
+.user-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.profile-icon {
+    font-size: 2.2rem;
+    color: #093ca2;
+    filter: drop-shadow(0 2px 4px rgba(9, 60, 162, 0.2));
+    transition: transform 0.2s ease;
+}
+
+.profile-icon:hover {
+    transform: scale(1.05);
+}
+
+.user-name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    width: max-content;
+}
+
+.logout-button {
+    background-color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    gap: 0.5rem;
+    font-size: 12px;
+    font-weight: 550;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    color: #093ca2;
+    border: 1.5px solid #093ca2;
+    padding: 8px 16px;
+    cursor: pointer;
+    width: max-content;
+    transition: all 0.2s ease;
+}
+
+.logout-button:hover {
+    background-color: #f1f7ff;
+    box-shadow: 0 3px 8px rgba(9, 60, 162, 0.15);
+    transform: translateY(-1px);
+}
+
+.logout-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px 3px rgba(9, 60, 162, 0.2);
+}
+
+.logout-icon {
+    width: 18px;
+    height: auto;
+}
+
+.role-info {
+    cursor: pointer;
+    color: #333;
+    font-size: 0.9rem;
+    margin-left: 10px;
+}
+
+.info-icon{
+    margin-top: 2px;
+}
+
+.role-popup {
+    position: absolute;
+    top: 100%;
+    right: 5%;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 200px;
+    z-index: 1001;
+    border: 1px solid #e6e6e6;
+}
+
+.role-popup-content {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.role-icon {
+    font-size: 1.5rem;
+    color: #093ca2;
+}
+
+.role-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.role-label {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.role-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #093ca2;
+}
