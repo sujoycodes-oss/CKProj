@@ -24,7 +24,7 @@ public class UserCloudAccount {
     @Column(name = "cloud_account_id", nullable = false, unique = true)
     private Long cloudAccountId;
 
-    @Column(name = "cloud_account_name")
+    @Column(name = "cloud_account_name", nullable = false, unique = true)
     private String cloudAccountName;
 
     @Column(name = "arn")

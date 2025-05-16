@@ -9,6 +9,7 @@ import com.ck.CloudBalance.service.AuthService;
 import com.ck.CloudBalance.service.LoginService;
 import com.ck.CloudBalance.utils.UserResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +38,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
@@ -51,9 +52,16 @@ public class LoginController {
 
 
     @GetMapping("/admin/users")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<UserResponse>> getAllUsers(){
+    @PreAuthorize("hasRole('ADMIN') or hasRole('READ_ONLY')")
+    public ResponseEntity<List<UserResponse>> getAllUsers() {
         return ResponseEntity.ok(loginService.getAllUsers());
+    }
+
+    //Filter Customers ----->>>>>
+    @GetMapping("/admin/users/customers")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<CustomerResponse>> getCustomerUsers() {
+        return ResponseEntity.ok(loginService.getCustomers());
     }
 
 
@@ -69,10 +77,7 @@ public class LoginController {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            BlackListedToken blackListedToken = new BlackListedToken();
-            blackListedToken.setToken(token);
-            blackListedToken.setBlacklistedAt(LocalDateTime.now());
-            blackListedTokenRepository.save(blackListedToken);
+            blackListedTokenRepository.save(new BlackListedToken(token, LocalDateTime.now()));
         }
         SecurityContextHolder.clearContext();
         return ResponseEntity.ok("Logged out successfully");
@@ -92,11 +97,21 @@ public class LoginController {
         return ResponseEntity.ok("Cloud account created successfully");
     }
 
-    @GetMapping("/admin/cloudAccounts")
-    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/cloudAccounts")
     public ResponseEntity<List<UserCloudAccount>> getAllCloudAccounts() {
         return ResponseEntity.ok(cloudAccountRepository.findAll());
     }
 
+    @PostMapping("/impersonate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<LoginResponse> impersonate(@RequestParam String targetEmail) {
+        return ResponseEntity.ok(authService.switchAccount(targetEmail));
+    }
+
+    @PostMapping("/stop-impersonation")
+    @PreAuthorize("hasRole('CUSTOMER')")
+    public ResponseEntity<LoginResponse> stopImpersonation(HttpServletRequest request) {
+        return ResponseEntity.ok(authService.stopImpersonation(request));
+    }
 
 }

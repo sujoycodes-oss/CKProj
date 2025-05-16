@@ -1,0 +1,103 @@
+/* FilterPanel.css */
+.filter-panel {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.filter-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.reset-btn {
+    background: none;
+    border: none;
+    color: #0056b3;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.filter-options {
+    max-height: calc(80vh - 100px);
+    overflow-y: auto;
+}
+
+.filter-section {
+    margin-bottom: 20px;
+}
+
+.filter-section h4 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.filter-values {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-left: 10px;
+}
+
+.filter-value {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.filter-value input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.filter-value label {
+    font-size: 14px;
+}
+
+.loading,
+.no-values {
+    color: #666;
+    font-size: 14px;
+    padding: 10px 0;
+}
+
+.filter-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.apply-btn,
+.close-btn {
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.apply-btn {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+}
+
+.close-btn {
+    background-color: #fff;
+    border: 1px solid #ccc;
+}

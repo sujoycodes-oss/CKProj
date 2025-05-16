@@ -1,0 +1,51 @@
+.groupbybar-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    background: #fff;
+}
+
+.groupby-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.more-dropdown {
+    position: relative;
+}
+
+.more-dropdown-content {
+    position: absolute;
+    top: 36px;
+    left: 0;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    min-width: 160px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    padding: 8px 0;
+}
+
+.more-item {
+    padding: 8px 16px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.more-item:hover {
+    background-color: #f0f0f0;
+}
+
+.filter-button {
+    display: flex;
+    align-items: center;
+}
+
+.filter-button button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}

@@ -1,3 +1,4 @@
+
 .account-selector {
     margin-top: 20px;
     width: 100%;
@@ -16,7 +17,7 @@
     background: #f9f9f9;
 }
 
-.account-section {
+.accounts-section {
     flex: 1;
     padding: 15px;
     background: white;

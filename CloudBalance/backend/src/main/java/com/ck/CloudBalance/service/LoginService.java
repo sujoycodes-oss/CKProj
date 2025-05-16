@@ -1,5 +1,6 @@
 package com.ck.CloudBalance.service;
 
+import com.ck.CloudBalance.dto.CustomerResponse;
 import com.ck.CloudBalance.entity.UsersEntity;
 import com.ck.CloudBalance.repository.UserRepository;
 import com.ck.CloudBalance.utils.UserResponse;
@@ -22,6 +23,14 @@ public class LoginService {
         List<UsersEntity> users = userRepository.findAll();
         return users.stream()
                 .map(UserResponse::fromUser)
+                .collect(Collectors.toList());
+    }
+
+    public List<CustomerResponse> getCustomers() {
+        List<UsersEntity> users = userRepository.findAll();
+        return users.stream()
+                .filter(user-> "CUSTOMER".equals(user.getRole().getRoleName()))
+                .map(CustomerResponse::fromUser)
                 .collect(Collectors.toList());
     }
 

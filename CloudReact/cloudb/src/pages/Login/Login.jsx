@@ -1,13 +1,11 @@
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../../components/layout/Footer/footer';
 import { setAuthData } from '../../redux/actions/authActions';
 import { login } from '../../services/authService';
 import svgLogo from '../../assets/newCklogo.png';
 import '../../styles/Login.css';
-// import { Token } from '@mui/icons-material'; 
-// import { loginAction } from '../redux/actions/authActions';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -20,10 +18,25 @@ const Login = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
+    const user = useSelector(state => state.auth);
+
+    useEffect(() => {
+        if (user && user.role) {
+            const redirectPath =
+                user.role === 'ADMIN' ? '/admin' :
+                    user.role === 'READ_ONLY' ? '/readonly' :
+                        user.role === 'CUSTOMER' ? '/customer' :
+                            '/';
+
+            navigate(redirectPath, { replace: true });
+        }
+    }, [user, navigate]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError('');
+
 
         try {
             const response = await login(formData);
@@ -34,16 +47,20 @@ const Login = () => {
                 firstName: response.firstName,
                 lastName: response.lastName,
                 role: response.role,
+                cloudAccountIds: response.cloudAccountIds || null
             }));
 
             if (response.role === 'ADMIN') {
-                navigate('/admin');
-            } if(response.role === 'READ_ONLY') {
-                navigate('/readonly');
-            } if (response.role === 'CUSTOMER') {
-                navigate('/customer');
-            } 
+                navigate('/admin', { replace: true });
+            }
+            if (response.role === 'READ_ONLY') {
+                navigate('/readonly', { replace: true });
+            }
+            if (response.role === 'CUSTOMER') {
+                navigate('/customer/cost-explorer', { replace: true });
+            }
             
+
         } catch (error) {
             setError(error.response?.data?.message || 'Login failed');
         } finally {
@@ -68,7 +85,7 @@ const Login = () => {
                         <div className='form-group'>
                             <label htmlFor="email">Email</label>
                             <input
-                                type='email'
+                                type='text'
                                 name='email'
                                 placeholder='Business Email'
                                 value={formData.email}
@@ -93,7 +110,7 @@ const Login = () => {
                     </form>
                 </div>
             </div>
-            <Footer/>
+            <Footer />
         </>
     );
 };

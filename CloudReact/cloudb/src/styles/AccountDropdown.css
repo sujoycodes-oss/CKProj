@@ -1,0 +1,12 @@
+.account-dropdown-container {
+    display: flex;
+    top: 20px;
+    right: 20px;
+}
+
+.account-dropdown {
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}

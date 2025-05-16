@@ -6,6 +6,7 @@
 
 h1{
     margin-left: 15px;
+    margin-bottom: 0;
 }
 
 .floating-top{
@@ -22,7 +23,6 @@ h1{
     border-radius: 6px;
     margin-left: 15px;
     padding: 1rem 0.2rem;
-    margin-top: 0;
 }
 
 .whole-btn:hover {
@@ -31,7 +31,8 @@ h1{
 
 .fa-plus{
     width: 20px;
-    height: auto;
-    padding: 1px;
+    padding: 0.5px;
     margin-right: 10px;
 }
+
+

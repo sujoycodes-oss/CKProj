@@ -1,88 +1,345 @@
+/* Main Container Styles */
 .add-user-container {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    margin-left: 16px;
-    margin-top: 20px;
-    padding: 20px;
+    margin: 20px 16px;
+    padding: 30px;
     background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     width: 90%;
+    max-width: 1200px;
 }
 
 h1 {
-    margin-bottom: 20px;
-    font-size: 24px;
+    margin-bottom: 30px;
+    font-size: 26px;
     font-weight: 600;
     color: #333;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 15px;
+}
+
+/* Form Layout */
+.form-div {
+    width: 100%;
 }
 
 .form-class {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px 50px;
-    /* width: 100%; */
-    /* max-width: 100px; */
+    gap: 25px 50px;
+    width: 100%;
 }
 
-.form-class div {
+.form-group {
     display: flex;
     flex-direction: column;
+    margin-bottom: 5px;
 }
 
+/* Form Elements */
 .form-class label {
     font-weight: 500;
-    margin-bottom: 8px;
-    font-size: 16px;
+    margin-bottom: 10px;
+    font-size: 15px;
     color: #444;
 }
 
 .form-class input,
 .form-class select {
-    padding: 0.75rem 10rem 0.75rem 0.75rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 16px;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
     background-color: #fdfdfd;
-    transition: border 0.2s ease;
+    transition: all 0.2s ease;
+    width: 100%;
 }
-
-
 
 .form-class input:focus,
 .form-class select:focus {
-    border-color: #2684ff;
+    border-color: #007aff;
     outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
 }
 
 .form-class select {
     background-color: #fff;
     cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px top 50%;
+    background-size: 12px auto;
+    padding-right: 30px;
+}
+
+/* Error and Success Handling */
+.error-input {
+    border-color: #e53935;
+    background-color: rgba(229, 57, 53, 0.02);
+}
+
+.error-text {
+    color: #e53935;
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+.submit-error {
+    grid-column: 1 / -1;
+    padding: 10px;
+    background-color: rgba(229, 57, 53, 0.05);
+    border-left: 3px solid #e53935;
+    margin-top: 15px;
+}
+
+.success-message {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: rgba(76, 175, 80, 0.08);
+    color: #2e7d32;
+    border-left: 3px solid #4caf50;
+    border-radius: 4px;
+    font-weight: 500;
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Form Actions */
+.form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    margin-top: 15px;
 }
 
 button[type="submit"] {
-    /* grid-column: 1 / -1; */
-    margin-top: 30px;
-    padding: 12px;
+    padding: 12px 30px;
     background-color: #007aff;
     color: white;
     border: none;
     font-weight: 600;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 15px;
-    transition: background-color 0.2s ease;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 122, 255, 0.2);
 }
 
 button[type="submit"]:hover {
-    background-color: #005fcc;
+    background-color: #0062cc;
+    box-shadow: 0 4px 8px rgba(0, 122, 255, 0.3);
 }
 
-.error-input {
-    border-color: red;
+button[type="submit"]:disabled {
+    background-color: #b0c6e1;
+    cursor: not-allowed;
+    box-shadow: none;
 }
 
-.error-text {
-    color: red;
-    font-size: 13px;
-    margin-top: 4px;
+.clear-button {
+    padding: 12px 30px;
+    background-color: #f5f5f5;
+    color: #555;
+    border: 1px solid #ddd;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+}
+
+.clear-button:hover {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+/* Cloud Account Selector Styles */
+.account-selector {
+    grid-column: 1 / -1;
+    margin-top: 25px;
+    border-top: 1px solid #eee;
+    padding-top: 25px;
+    width: 100%;
+    transition: all 0.3s ease-in-out;
+}
+
+.account-selector h3 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+    font-weight: 600;
+}
+
+.account-container {
+    display: flex;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f9f9f9;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+.accounts-section {
+    flex: 1;
+    padding: 20px;
+    background: white;
+}
+
+.search-section {
+    margin-bottom: 15px;
+}
+
+.search-section h4 {
+    margin-bottom: 12px;
+    font-size: 16px;
+    color: #555;
+    font-weight: 500;
+}
+
+.search-section input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.search-section input:focus {
+    border-color: #007aff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 122, 255, 0.1);
+}
+
+.accounts-list {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    background-color: #fdfdfd;
+}
+
+.account-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.account-item:last-child {
+    border-bottom: none;
+}
+
+.account-item:hover {
+    background-color: #f5f8ff;
+}
+
+.account-item input[type="checkbox"] {
+    margin-right: 12px;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+.account-item span {
+    font-size: 14px;
+    color: #444;
+}
+
+.remove-button {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.remove-button:hover {
+    color: #e53935;
+    background-color: rgba(229, 57, 53, 0.1);
+}
+
+.transfer-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px 15px;
+    background: #f0f4f8;
+    border-left: 1px solid #e0e0e0;
+    border-right: 1px solid #e0e0e0;
+}
+
+.transfer-buttons button {
+    margin: 5px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.transfer-buttons button:hover {
+    background: #007aff;
+    color: white;
+    border-color: #007aff;
+    box-shadow: 0 2px 5px rgba(0, 122, 255, 0.2);
+}
+
+.no-accounts {
+    padding: 25px 15px;
+    text-align: center;
+    color: #999;
+}
+
+.no-accounts p:first-child {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #666;
+}
+
+.loading-text {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+}
+
+.accounts-error {
+    display: block;
+    margin: 10px 0;
+    grid-column: 1 / -1;
+}
+
+/* Animation for when account selector appears */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.account-selector {
+    animation: fadeIn 0.3s ease-out;
 }

@@ -4,36 +4,42 @@ import axios from 'axios';
 import { MdArrowForwardIos, MdOutlineArrowBackIosNew } from "react-icons/md";
 import "../../../styles/CloudAccountSelector.css";
 
-const CloudAccountSelector = ({ onAccountsSelected, selectedRole }) => {
+const CloudAccountSelector = ({ onAccountsSelected, selectedRole, initialSelectedAccounts = [] }) => {
   const [availableAccounts, setAvailableAccounts] = useState([]);
   const [selectedAccounts, setSelectedAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  // Get token from Redux store
   const authData = useSelector(state => state.auth);
 
   useEffect(() => {
-    // Reset selected accounts when role changes away from customer
-    if (selectedRole.toLowerCase() !== 'customer') {
-      setSelectedAccounts([]);
-      onAccountsSelected([]);
+    if (initialSelectedAccounts && initialSelectedAccounts.length > 0) {
+      setSelectedAccounts(initialSelectedAccounts);
     }
-  }, [selectedRole, onAccountsSelected]);
+  }, []);
 
+  // Handle role changes
   useEffect(() => {
-    // Only fetch accounts when the role is customer
-    if (selectedRole.toLowerCase() === 'customer') {
+    if (selectedRole.toLowerCase() !== 'customer') {
+      if (selectedAccounts.length > 0) {
+        setSelectedAccounts([]);
+        onAccountsSelected([]);
+      }
+    } else {
       fetchCloudAccounts();
     }
-  }, [selectedRole, authData.token]);
+  }, [selectedRole]);
 
   const fetchCloudAccounts = async () => {
+    if (!authData.token || selectedRole.toLowerCase() !== 'customer') {
+      return;
+    }
+    
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:8080/auth/admin/cloudAccounts', {
+      const response = await axios.get('http://localhost:8080/auth/cloudAccounts', {
         headers: {
           'Authorization': `Bearer ${authData.token}`
         }
@@ -72,7 +78,6 @@ const CloudAccountSelector = ({ onAccountsSelected, selectedRole }) => {
     }
   };
 
-  // Don't render anything if role is not customer
   if (selectedRole.toLowerCase() !== 'customer') {
     return null;
   }
@@ -85,7 +90,7 @@ const CloudAccountSelector = ({ onAccountsSelected, selectedRole }) => {
       
       {!loading && !error && (
         <div className="account-container">
-          <div className="account-section">
+          <div className="accounts-section">
             <div className="search-section">
               <h4>Choose Account IDs to Associate</h4>
               <input
@@ -108,7 +113,7 @@ const CloudAccountSelector = ({ onAccountsSelected, selectedRole }) => {
                     <input
                       type="checkbox"
                       checked={selectedAccounts.includes(account.id)}
-                      onChange={() => handleAccountSelect(account.id)}
+                      onChange={() => {}} // Handled by the div onClick
                     />
                     <span>{account.cloudAccountName} ({account.cloudAccountId})</span>
                   </div>
@@ -126,8 +131,10 @@ const CloudAccountSelector = ({ onAccountsSelected, selectedRole }) => {
             </button>
           </div>
 
-          <div className="account-section">
-            <h4>Associated Account IDs</h4>
+          <div className="accounts-section">
+            <div className="search-section">
+              <h4>Associated Account IDs</h4>
+            </div>
             <div className="accounts-list">
               {selectedAccounts.length === 0 ? (
                 <div className="no-accounts">
@@ -141,7 +148,10 @@ const CloudAccountSelector = ({ onAccountsSelected, selectedRole }) => {
                     <div key={account.id} className="account-item">
                       <span>{account.cloudAccountName} ({account.cloudAccountId})</span>
                       <button
-                        onClick={() => handleAccountSelect(account.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAccountSelect(account.id);
+                        }}
                         className="remove-button"
                         type="button"
                       >

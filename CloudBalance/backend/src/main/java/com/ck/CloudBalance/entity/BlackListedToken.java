@@ -1,15 +1,13 @@
 package com.ck.CloudBalance.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Table(name = "BlackListedToken")
 public class BlackListedToken {
 
     @Id
@@ -19,4 +17,12 @@ public class BlackListedToken {
     private String token;
 
     private LocalDateTime blacklistedAt;
+
+    public BlackListedToken() {}
+
+    public BlackListedToken(String token, LocalDateTime blacklistedAt) {
+        this.token = token;
+        this.blacklistedAt = blacklistedAt;
+    }
+
 }

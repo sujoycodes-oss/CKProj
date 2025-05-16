@@ -9,5 +9,6 @@ import java.util.Optional;
 public interface CloudAccountRepository extends JpaRepository<UserCloudAccount, Long> {
     Optional<UserCloudAccount> findById(Long accountId);
     boolean existsByCloudAccountId(Long cloudAccountId);
-
+    Optional<UserCloudAccount> findByCloudAccountId(Long cloudAccountId);
+    
 }

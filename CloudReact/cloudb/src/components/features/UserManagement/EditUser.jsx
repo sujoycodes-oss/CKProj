@@ -4,18 +4,17 @@ import axios from 'axios';
 import CloudAccountManager from './CloudAccountSelector';
 import '../../../styles/EditUser.css';
 import { useSelector } from 'react-redux';
-
+import { getUsers } from "../../../services/api";
+import { toast } from 'react-toastify';
 
 const formConfig = [
     { label: "First Name", name: "firstName", placeholder: "Enter First Name", type: "text", required: true },
     { label: "Last Name", name: "lastName", placeholder: "Enter Last Name", type: "text", required: true },
-    { label: "Email", name: "email", placeholder: "Enter Email ID", type: "email", required: true },
+    { label: "Email", name: "email", placeholder: "Enter Email ID", type: "email", required: true, readOnly: true },
     { label: "Password", name: "password", placeholder: "Enter New Password (optional)", type: "password", required: false },
 ];
 
 const roles = ["ADMIN", "READ_ONLY", "CUSTOMER"];
-
-
 
 const EditUser = () => {
     const authData = useSelector(state => state.auth);
@@ -27,37 +26,59 @@ const EditUser = () => {
         email: "",
         password: "",
         roleName: "",
-        cloudIds: [],
+        cloudAccountIds: [], 
     });
     
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const token = authData.token;
+    
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchUserData = async () => {
+            if (!token) {
+                navigate('/');
+                return;
+            }
+            
+            setIsLoading(true);
             try {
-                const response = await axios.get(`http://localhost:8080/auth/admin/users/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const userData = response.data.data;
+                // Use the getUsers API to get all users
+                const response = await getUsers();
+                const users = response.data || [];
+                
+                // Find the user with the matching ID
+                const userData = users.find(user => user.id === parseInt(id));
+                
+                if (!userData) {
+                    throw new Error('User not found');
+                }
+                
+               
                 setFormData({
-                    firstName: userData.firstName,
-                    lastName: userData.lastName,
-                    email: userData.email,
+                    firstName: userData.firstName || "",
+                    lastName: userData.lastName || "",
+                    email: userData.email || "",
                     password: "",
-                    roleName: userData.role,
-                    cloudIds: userData.cloudAccounts?.map(acc => acc.id) || [],
+                    roleName: userData.role || "",
+                    cloudAccountIds: userData.assignedCloudAccountIds || [], 
                 });
             } catch (error) {
                 console.error('Error fetching user:', error);
-                navigate('/admin/users');
+                setErrors({
+                    submit: error.message || 'Failed to load user data'
+                });
+                
+                if (error.response?.status === 401) {
+                    navigate('/');
+                }
+            } finally {
+                setIsLoading(false);
             }
         };
         
-        fetchUser();
-    }, [id, navigate, token]);
+        fetchUserData();
+    }, [id, token, navigate]);
     
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -66,13 +87,14 @@ const EditUser = () => {
     };
     
     const handleCloudAccountsSelected = (selectedAccounts) => {
-        setFormData(prev => ({ ...prev, cloudIds: selectedAccounts }));
+        setFormData(prev => ({ ...prev, cloudAccountIds: selectedAccounts }));
     };
     
     const handleSubmit = async (e) => {
         e.preventDefault();
         const newErrors = {};
         
+        // Validate required fields
         formConfig.forEach(({ name, required }) => {
             if (required && !formData[name]) {
                 newErrors[name] = `${name} is required`;
@@ -83,8 +105,9 @@ const EditUser = () => {
             newErrors.roleName = "Role is required";
         }
         
-        if (formData.roleName === "CUSTOMER" && formData.cloudIds.length === 0) {
-            newErrors.cloudIds = "At least one cloud account must be selected for Customer role";
+        if (formData.roleName === "CUSTOMER" && 
+            (!formData.cloudAccountIds || formData.cloudAccountIds.length === 0)) {
+            newErrors.cloudAccountIds = "At least one cloud account must be selected for Customer role";
         }
         
         setErrors(newErrors);
@@ -92,16 +115,29 @@ const EditUser = () => {
         if (Object.keys(newErrors).length === 0) {
             setIsSubmitting(true);
             try {
+                const payload = {
+                    firstName: formData.firstName,
+                    lastName: formData.lastName,
+                    roleName: formData.roleName,
+                    cloudAccountIds: formData.cloudAccountIds,
+                };
+                
+                if (formData.password && formData.password.trim() !== '') {
+                    payload.password = formData.password;
+                }
+                
                 await axios.put(`http://localhost:8080/auth/admin/users/${id}`,
-                    formData,
+                    payload,
                     {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     }
                 );
-                navigate('/admin/users');
+                toast.success('User updated successfully');
+                // navigate('/admin');
             } catch (error) {
+                console.error('Error updating user:', error);
                 setErrors({
                     submit: error.response?.data?.message || 'Failed to update user'
                 });
@@ -111,12 +147,16 @@ const EditUser = () => {
         }
     };
 
+    if (isLoading) {
+        return <div className="loading">Loading user data...</div>;
+    }
+
     return (
         <div className="edit-user-container">
             <h1>Edit User</h1>
             <div className="edit-form-container">
                 <form onSubmit={handleSubmit} className="edit-form">
-                    {formConfig.map(({ label, name, placeholder, type, required }) => (
+                    {formConfig.map(({ label, name, placeholder, type, required, readOnly }) => (
                         <div key={name} className="form-group">
                             <label htmlFor={name}>{label}</label>
                             <input
@@ -128,6 +168,7 @@ const EditUser = () => {
                                 className={errors[name] ? 'error' : ''}
                                 onChange={handleChange}
                                 required={required}
+                                readOnly={readOnly}
                             />
                             {errors[name] && <span className="error-text">{errors[name]}</span>}
                         </div>
@@ -156,15 +197,22 @@ const EditUser = () => {
                     <CloudAccountManager
                         selectedRole={formData.roleName}
                         onAccountsSelected={handleCloudAccountsSelected}
-                        initialSelectedAccounts={formData.cloudIds}
+                        initialSelectedAccounts={formData.cloudAccountIds}
                     />
-                    {errors.cloudIds && <span className="error-text">{errors.cloudIds}</span>}
+                    {errors.cloudAccountIds && <span className="error-text">{errors.cloudAccountIds}</span>}
 
                     {errors.submit && <div className="error-text">{errors.submit}</div>}
 
                     <div className="form-actions">
                         <button type="submit" disabled={isSubmitting}>
                             {isSubmitting ? 'Updating...' : 'Update User'}
+                        </button>
+                        <button 
+                            type="button" 
+                            onClick={() => navigate('/admin')} 
+                            className="cancel-button"
+                        >
+                            Cancel
                         </button>
                     </div>
                 </form>

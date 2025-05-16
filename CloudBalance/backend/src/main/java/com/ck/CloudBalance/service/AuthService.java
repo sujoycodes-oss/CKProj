@@ -10,10 +10,13 @@ import com.ck.CloudBalance.repository.RoleRepository;
 import com.ck.CloudBalance.repository.UserAccountRepository;
 import com.ck.CloudBalance.repository.UserRepository;
 import com.ck.CloudBalance.utils.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +52,10 @@ public class AuthService {
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        List<Long> cloudAccountIds = user.getUserAccounts().stream()
+                .map(userAccount -> userAccount.getUserCloudAccount().getId())
+                .collect(Collectors.toList());
+
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
@@ -56,70 +64,99 @@ public class AuthService {
 
         var jwtToken = jwtService.generateToken(extraClaims, user);
 
-
         return new LoginResponse(
                 jwtToken,
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getRole().getRoleName()
+                user.getRole().getRoleName(),
+                cloudAccountIds
         );
     }
 
-    public UserResponse register(RegisterRequest request) {
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already in use");
+    // Switch account Logic ----->>>>>>
+    public LoginResponse switchAccount(String targetEmail) {
+        String loggedInEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        UsersEntity admin = userRepository.findByEmail(loggedInEmail)
+                .orElseThrow(() -> new RuntimeException("Admin not found"));
+
+        if (!"ADMIN".equalsIgnoreCase(admin.getRole().getRoleName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only admins can switch accounts.");
         }
 
-        RoleEntity role = roleRepository.findByRoleName(request.getRoleName())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
-
-        UsersEntity user = new UsersEntity();
-        user.setEmail(request.getEmail());
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(role);
-
-        List<UserAccount> accountAssignments = new ArrayList<>();
-        if (request.getCloudIds() != null && !request.getCloudIds().isEmpty()) {
-            for (Long cloudAccountId : request.getCloudIds()) {
-                UserCloudAccount cloudAccount = cloudAccountRepository.findById(cloudAccountId)
-                        .orElseThrow(() -> new RuntimeException("Cloud account not found"));
-
-                UserAccount assignment = UserAccount.builder()
-                        .user(user)
-                        .userCloudAccount(cloudAccount)
-                        .build();
-
-                accountAssignments.add(assignment);
-            }
+        UsersEntity customer = userRepository.findByEmail(targetEmail)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
+        if (!"CUSTOMER".equalsIgnoreCase(customer.getRole().getRoleName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only customers can be switched.");
         }
-        user.setUserAccounts(accountAssignments);
-        UsersEntity savedUser = userRepository.save(user);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("impersonating", true);
+        claims.put("impersonatedBy", admin.getEmail());
+        claims.put("role", customer.getRole().getRoleName());
+        claims.put("actualRole", admin.getRole().getRoleName());
 
-        return UserResponse.fromUser(savedUser);
+        List<Long> cloudAccountIds = customer.getUserAccounts().stream()
+                .map(userAccount -> userAccount.getUserCloudAccount().getId())
+                .collect(Collectors.toList());
+
+        String jwtToken = jwtService.generateToken(claims, customer);
+
+        return new LoginResponse(
+                jwtToken,
+                customer.getEmail(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getRole().getRoleName(),
+                cloudAccountIds
+        );
+
     }
 
-    public void createCloudAccount(CloudAccountRequest request){
-        if (cloudAccountRepository.existsByCloudAccountId(request.getCloudAccountId())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cloud account already exists");
-        } else {
-            UserCloudAccount cloudAccount = UserCloudAccount.builder()
-                    .cloudAccountId(request.getCloudAccountId())
-                    .cloudAccountName(request.getCloudAccountName())
-                    .arn(request.getArn())
-                    .region(request.getRegion())
-                    .orphan(true)
-                    .build();
-            cloudAccountRepository.save(cloudAccount);
+    public LoginResponse stopImpersonation(HttpServletRequest request) {
+        Boolean isImpersonating = (Boolean) request.getAttribute("impersonating");
+        String impersonatedBy = (String) request.getAttribute("impersonatedBy");
+
+        if (!Boolean.TRUE.equals(isImpersonating) || impersonatedBy == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not currently impersonating.");
         }
+
+        UsersEntity admin = userRepository.findByEmail(impersonatedBy)
+                .orElseThrow(() -> new UsernameNotFoundException("Original admin not found"));
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", admin.getRole().getRoleName());
+        claims.put("impersonating", false);
+        claims.put("impersonatedBy", null);
+
+        List<Long> cloudAccountIds = admin.getUserAccounts().stream()
+                .map(a -> a.getUserCloudAccount().getId())
+                .collect(Collectors.toList());
+
+        String jwtToken = jwtService.generateToken(claims, admin);
+
+        return new LoginResponse(
+                jwtToken,
+                admin.getEmail(),
+                admin.getFirstName(),
+                admin.getLastName(),
+                admin.getRole().getRoleName(),
+                cloudAccountIds
+        );
     }
+
 
     public void updateUserAndAccounts(Long id, UserUpdateRequest request) {
+        String loggedInEmail = SecurityContextHolder.getContext().getAuthentication().getName(); // fetching email from security context
+
+        UsersEntity loggedInUser = userRepository.findByEmail(loggedInEmail)
+                .orElseThrow(() -> new RuntimeException("Logged-in user not found"));
+
+        if (loggedInUser.getId().equals(id)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to modify your own account.");
+        }
+
         UsersEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
         RoleEntity role = roleRepository.findByRoleName(request.getRoleName())
                 .orElseThrow(() -> new RuntimeException("Invalid role: " + request.getRoleName()));
 
@@ -161,6 +198,56 @@ public class AuthService {
 
                 userAccountRepository.save(userAccount);
             }
+        }
+    }
+
+    public UserResponse register(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new RuntimeException("Email already in use");
+        }
+
+        RoleEntity role = roleRepository.findByRoleName(request.getRoleName())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+
+        UsersEntity user = new UsersEntity();
+        user.setEmail(request.getEmail());
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRole(role);
+
+        List<UserAccount> accountAssignments = new ArrayList<>();
+        if (request.getCloudIds() != null && !request.getCloudIds().isEmpty()) {
+            for (Long cloudAccountId : request.getCloudIds()) {
+                UserCloudAccount cloudAccount = cloudAccountRepository.findById(cloudAccountId)
+                        .orElseThrow(() -> new RuntimeException("Cloud account not found"));
+
+                UserAccount assignment = UserAccount.builder()
+                        .user(user)
+                        .userCloudAccount(cloudAccount)
+                        .build();
+
+                accountAssignments.add(assignment);
+            }
+        }
+        user.setUserAccounts(accountAssignments);
+        UsersEntity savedUser = userRepository.save(user);
+
+        return UserResponse.fromUser(savedUser);
+    }
+
+    public void createCloudAccount(CloudAccountRequest request) {
+        if (cloudAccountRepository.existsByCloudAccountId(request.getCloudAccountId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cloud account already exists");
+        } else {
+            UserCloudAccount cloudAccount = UserCloudAccount.builder()
+                    .cloudAccountId(request.getCloudAccountId())
+                    .cloudAccountName(request.getCloudAccountName())
+                    .arn(request.getArn())
+                    .region(request.getRegion())
+                    .orphan(true)
+                    .build();
+            cloudAccountRepository.save(cloudAccount);
         }
     }
 }

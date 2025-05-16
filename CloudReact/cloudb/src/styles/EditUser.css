@@ -1,85 +1,146 @@
+/* EditUser.css */
 .edit-user-container {
-    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px;
 }
 
 .edit-user-container h1 {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 24px;
     color: #333;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 12px;
 }
 
 .edit-form-container {
     background: white;
     border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .edit-form {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 24px;
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
+    margin-bottom: 8px;
 }
 
 .form-group label {
     font-weight: 500;
     margin-bottom: 8px;
     color: #444;
+    font-size: 14px;
 }
 
 .form-group input,
 .form-group select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
     font-size: 14px;
+    transition: all 0.2s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     border-color: #2684ff;
     outline: none;
-    box-shadow: 0 0 0 1px #2684ff;
+    box-shadow: 0 0 0 2px rgba(38, 132, 255, 0.2);
 }
 
 .form-group input.error,
 .form-group select.error {
     border-color: #dc3545;
+    background-color: rgba(220, 53, 69, 0.05);
 }
 
 .error-text {
     color: #dc3545;
     font-size: 12px;
-    margin-top: 4px;
+    margin-top: 6px;
+    font-weight: 500;
+}
+
+/* Make CloudAccountManager span the full width */
+.edit-form>div:nth-last-child(3) {
+    grid-column: span 2;
 }
 
 .form-actions {
     grid-column: span 2;
-    margin-top: 20px;
+    margin-top: 32px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
 }
 
 .form-actions button {
-    padding: 10px 20px;
+    padding: 12px 24px;
     background-color: #007aff;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    font-size: 14px;
 }
 
 .form-actions button:hover {
     background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-actions button:active {
+    transform: translateY(0);
 }
 
 .form-actions button:disabled {
-    background-color: #ccc;
+    background-color: #b3d7ff;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.form-actions .cancel-button {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.form-actions .cancel-button:hover {
+    background-color: #e0e0e0;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+    font-size: 18px;
+    color: #666;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .edit-form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        grid-column: span 1;
+    }
+
+    /* Make CloudAccountManager span single column on mobile */
+    .edit-form>div:nth-last-child(3) {
+        grid-column: span 1;
+    }
 }

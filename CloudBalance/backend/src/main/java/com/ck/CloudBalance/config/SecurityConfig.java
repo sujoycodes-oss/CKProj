@@ -42,7 +42,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/auth/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/auth/admin/users").hasAnyRole("ADMIN", "READ_ONLY")
+                        .requestMatchers("/auth/admin/**", "/auth/impersonate").hasRole("ADMIN")
+                        .requestMatchers("/api/aws/**",
+                                "/auth/cloudAccounts",
+                                "/api/snowflake/**").hasAnyRole("ADMIN", "READ_ONLY", "CUSTOMER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(

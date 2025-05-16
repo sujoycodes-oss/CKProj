@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -69,4 +70,18 @@ public class JwtService {
     private Date extractExpiration(String jwt) {
         return extractClaim(jwt, Claims::getExpiration);
     }
+
+    public List<Long> extractCloudAccountIds(String token) {
+        final Claims claims = extractAllClaims(token);
+        return (List<Long>) claims.get("cloudAccountIds");
+    }
+
+    public String extractImpersonatedBy(String token) {
+        return extractClaim(token, claims -> claims.get("impersonatedBy", String.class));
+    }
+
+    public Boolean isImpersonating(String token) {
+        return extractClaim(token, claims -> claims.get("impersonating", Boolean.class));
+    }
+
 }

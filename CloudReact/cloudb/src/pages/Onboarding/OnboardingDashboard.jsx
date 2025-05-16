@@ -4,25 +4,81 @@ import '../../styles/OnboardingDashboard.css';
 import FirstPage from './pages/FirstPage';
 import SecondPage from './pages/SecondPage';
 import ThirdPage from './pages/ThirdPage';
-// import ThankYouPage from './ThankYou';
+import { formFields } from '../../config/arnConfig';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
 
 const OnboardingDashboard = () => {
-    const [step, setStep] = useState(0);
+    const [step, setStep] = useState(1); 
+    const [formData, setFormData] = useState({
+        accountName: '',
+        accountId: '',
+        region: '',
+        arn: ''
+    });
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const navigate = useNavigate();
+    const token = useSelector(state => state.auth.token);
 
     const handleNext = () => {
-        if (step < 3) {
-            setStep(prev => prev + 1);
-        } else {
-            navigate('./thank-you')
+        if (step === 1) {
+            const newErrors = {};
+            formFields.forEach(({ name, validate }) => {
+                const error = validate(formData[name]);
+                if (error) newErrors[name] = error;
+            });
+
+            setErrors(newErrors);
+            if (Object.keys(newErrors).length > 0) {
+                return;
+            }
+        }
+
+        // Submit on last step
+        if (step === 3) {
+            handleSubmit();
+            return;
+        }
+
+        // Go to next step
+        setStep(prev => prev + 1);
+    };
+
+    const handleSubmit = async () => {
+        setIsSubmitting(true);
+        try {
+            const response = await axios.post(
+                'http://localhost:8080/auth/admin/cloudAccount',
+                {
+                    cloudAccountId: Number(formData.accountId),
+                    cloudAccountName: formData.accountName,
+                    region: formData.region,
+                    arn: formData.arn
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
+
+            if (response.status === 200) {
+                navigate('/admin/thank-you');
+            }
+        } catch (error) {
+            console.error("Submission error:", error);
+            toast.error(error.response?.data?.message || "Failed to submit form");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleBack = () => {
-        if (step > 0) {
+        if (step > 1) {
             setStep(prev => prev - 1);
-        } else {
-            navigate('/onboarding-dashboard');
         }
     };
 
@@ -30,17 +86,31 @@ const OnboardingDashboard = () => {
         navigate('/admin');
     };
 
+    const updateFormData = (field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+        // Clear error when field is updated
+        if (errors[field]) {
+            setErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[field];
+                return newErrors;
+            });
+        }
+    };
+
     const renderStepContent = () => {
         switch (step) {
-            case 0:
-                return (
-                    <div className="step-content">
-                        <h2>Welcome to the Onboarding Dashboard</h2>
-                        <p>Click below to start setting up your IAM Role & Account.</p>
-                    </div>
-                );
             case 1:
-                return <FirstPage />;
+                return (
+                    <FirstPage 
+                        formData={formData}
+                        updateFormData={updateFormData}
+                        errors={errors}
+                    />
+                );
             case 2:
                 return <SecondPage />;
             case 3:
@@ -60,20 +130,28 @@ const OnboardingDashboard = () => {
 
             <div className="onboarding-footer">
                 <div>
-                    {step > 0 && <button className="cancel-button" onClick={handleCancel}>Cancel</button>}
+                    <button className="cancel-button" onClick={handleCancel}>
+                        Cancel
+                    </button>
                 </div>
                 <div className="nav-buttons">
-                    {step > 0 && <button className="back-button" onClick={handleBack}>
-                        {step === 1 ? 'Back'
-                            : step === 2 ? 'Back - Create An IAM Role'
+                    {step > 1 && (
+                        <button className="back-button" onClick={handleBack}>
+                            {step === 2 ? 'Back - Create An IAM Role'
                                 : step === 3 ? 'Back - Add Customer Managed Policies'
                                     : 'Back'}
-                    </button>}
-                    <button className="next-button" onClick={handleNext}>
-                        {step === 1 ? 'Next - Add Customer Managed Policies'
+                        </button>
+                    )}
+                    <button 
+                        className="next-button" 
+                        onClick={handleNext}
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? 'Processing...' : 
+                            step === 1 ? 'Next - Add Customer Managed Policies'
                             : step === 2 ? 'Next - Create S3 bucket'
-                                : step === 3 ? 'Submit'
-                                    : 'Next'}
+                            : step === 3 ? 'Submit'
+                            : 'Next'}
                     </button>
                 </div>
             </div>

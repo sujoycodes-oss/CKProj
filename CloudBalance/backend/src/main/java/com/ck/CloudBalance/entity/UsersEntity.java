@@ -3,6 +3,7 @@ package com.ck.CloudBalance.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -62,6 +63,10 @@ public class UsersEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_"+role.getRoleName()));
     }
+//
+//    public void setEmail(String email) {
+//        this.email = email != null ? email.trim() : null;
+//    }
 
     @Override
     public String getUsername() {
